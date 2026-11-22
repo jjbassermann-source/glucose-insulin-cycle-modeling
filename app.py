@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # =====================================================================
 st.set_page_config(
     page_title="In-silico Glukose-Insulin-Dynamik | Menstruationszyklus & KOK",
-    page_icon="🩸",
+    page_icon="💊",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -50,7 +50,7 @@ st.markdown("""
         border-radius: 16px;
         padding: 18px 20px;
         border: 1px solid #f8bbd0;
-        box-shadow: 0 8px 22px rgba(233, 30, 99, 0.18);
+        box-shadow: 0 8px 22px rgba(233, 30, 99, 0.16);
         margin-bottom: 18px;
     }
     .card-heading {
@@ -69,7 +69,7 @@ st.markdown("""
         border-radius: 16px;
         padding: 20px 22px;
         border: 1px solid #f48fb1;
-        box-shadow: 0 8px 22px rgba(233, 30, 99, 0.20);
+        box-shadow: 0 8px 22px rgba(233, 30, 99, 0.18);
         margin-top: 6px;
     }
     .metric-row {
@@ -119,10 +119,20 @@ st.markdown("""
         font-size: 0.80rem;
         color: #7b5865;
         font-style: italic;
-        line-height: 1.4;
-        background: rgba(255, 255, 255, 0.65);
-        padding: 8px 10px;
+        line-height: 1.45;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 9px 11px;
         border-radius: 8px;
+    }
+    .source-badge {
+        margin-top: 8px;
+        font-size: 0.78rem;
+        color: #880e4f;
+        background: rgba(255, 255, 255, 0.85);
+        border-left: 3px solid #e91e63;
+        padding: 6px 10px;
+        border-radius: 6px;
+        line-height: 1.35;
     }
 
     /* Rosa gepunkteter Rahmen um den Graphen (linke Spalte) */
@@ -131,18 +141,18 @@ st.markdown("""
         border-radius: 18px;
         padding: 16px;
         background-color: #ffffff;
-        box-shadow: 0 6px 20px rgba(240, 98, 146, 0.12);
+        box-shadow: 0 6px 20px rgba(240, 98, 146, 0.10);
     }
 
-    /* Schieberegler-Griff als Blutstropfen (Streamlit / BaseWeb Slider) */
+    /* Schieberegler-Griff als Anti-Baby-Pille (zweifarbige Kapsel / runde Tablette mit Kerbe) */
     div[data-baseweb="slider"] div[role="slider"] {
-        width: 20px !important;
-        height: 20px !important;
-        background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%) !important;
-        border-radius: 0 50% 50% 50% !important;
-        transform: rotate(45deg) !important;
-        border: 2px solid #ffffff !important;
-        box-shadow: 0 3px 8px rgba(173, 20, 87, 0.45) !important;
+        width: 28px !important;
+        height: 16px !important;
+        background: linear-gradient(90deg, #f06292 0%, #f06292 48%, #ffffff 48%, #ffffff 52%, #fce4ec 52%, #f8bbd0 100%) !important;
+        border-radius: 999px !important;
+        transform: rotate(-18deg) !important;
+        border: 2px solid #ad1457 !important;
+        box-shadow: 0 3px 8px rgba(173, 20, 87, 0.35) !important;
     }
     div[data-baseweb="slider"] div[data-testid="stTickBar"] {
         color: #ad1457 !important;
@@ -160,6 +170,23 @@ st.markdown("""
     button[data-baseweb="tab"][aria-selected="true"] {
         border-bottom-color: #d81b60 !important;
         color: #d81b60 !important;
+    }
+
+    /* Einklappbare Quellen-Box (Expander) */
+    div[data-testid="stExpander"] {
+        background-color: #ffffff;
+        border: 1px solid #f8bbd0;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(233, 30, 99, 0.08);
+        margin-top: 22px;
+    }
+    .ref-item {
+        font-size: 0.88rem;
+        color: #4a2533;
+        margin-bottom: 10px;
+        padding-left: 10px;
+        border-left: 3px solid #f06292;
+        line-height: 1.45;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -259,7 +286,7 @@ def get_cycle_weights(day):
 # =====================================================================
 st.markdown("""
 <div class="hero-header">
-    <div class="hero-title">🩸 In-silico Glukose-Insulin-Dynamik (OGTT)</div>
+    <div class="hero-title">💊 In-silico Glukose-Insulin-Dynamik (OGTT)</div>
     <p class="hero-subtitle">
         Interaktive Simulation des erweiterten Bergman-Minimal-Modells im Verlauf des Menstruationszyklus
         und unter kombinierten oralen Kontrazeptiva (KOK) auf Basis klinischer Studiendaten.
@@ -268,7 +295,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 tab_cycle, tab_study = st.tabs([
-    "🩸 Zyklustag-Simulator & Hormonprofil",
+    "💊 Zyklustag-Simulator & Hormonprofil",
     "📊 Klinischer Studienvergleich (Datengetreu)"
 ])
 
@@ -313,8 +340,9 @@ with tab_cycle:
             p4_text = "Konstant (exogen supprimiert)"
             curve_color = "#2e7d32"
             ref_points = empirical_glucose['Kontrazeptiva']
-            ref_label = "Empirische OGTT-Messwerte (KOK, Godsland et al.)"
-            note_text = "Direkt an klinischen OGTT-Daten unter KOK (150 µg LNG / 30 µg EE) gefittete Parameter."
+            ref_label = "Empirische OGTT-Messwerte (KOK, Godsland et al. 1990)"
+            note_text = "Direkt an klinischen OGTT-Daten unter KOK (150 µg Levonorgestrel / 30 µg Ethinylestradiol) gefittete Parameter."
+            source_text = "Primärquelle (KOK): Godsland et al. (1990), New England Journal of Medicine, 323(20), 1375–1381."
         else:
             w_foll, w_lut = get_cycle_weights(selected_day)
             pf = fit_parameters['Follikelphase']
@@ -348,12 +376,13 @@ with tab_cycle:
 
             if selected_day <= 14:
                 ref_points = empirical_glucose['Follikelphase']
-                ref_label = "Klinische Referenz: Follikelphase (Bennal & Kerure)"
+                ref_label = "Klinische Referenz: Follikelphase (Bennal & Kerure 2013)"
             else:
                 ref_points = empirical_glucose['Lutealphase']
-                ref_label = "Klinische Referenz: Lutealphase (Bennal & Kerure)"
+                ref_label = "Klinische Referenz: Lutealphase (Bennal & Kerure 2013)"
 
             note_text = "Modellierte Interpolation zwischen den klinisch gemessenen Zeitpunkten Tag 8 (Follikelphase) und Tag 22 (Lutealphase)."
+            source_text = "Primärquelle (Zyklus): Bennal & Kerure (2013), Journal of Clinical and Diagnostic Research, 7(10), 2180–2182."
 
         # Hellrosa Messwerte-Box
         st.markdown(f"""
@@ -385,6 +414,9 @@ with tab_cycle:
             </div>
             <div class="transparency-note">
                 ℹ️ {note_text}
+            </div>
+            <div class="source-badge">
+                📚 {source_text}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -521,3 +553,33 @@ with tab_study:
         plt.tight_layout()
         st.pyplot(fig2, use_container_width=True)
         plt.close(fig2)
+
+# =====================================================================
+# 6. WISSENSCHAFTLICHE QUELLEN & MODELLGRUNDLAGEN (EINKLAPPBAR)
+# =====================================================================
+with st.expander("📚 Wissenschaftliche Quellen & Modellgrundlagen anzeigen", expanded=False):
+    st.markdown("""
+    <div class="ref-item">
+        <strong>1. Menstruationszyklus (Follikel- vs. Lutealphase, 75 g OGTT):</strong><br>
+        Bennal, A. S., & Kerure, S. B. (2013). <em>Glucose tolerance during different phases of menstrual cycle.</em>
+        Journal of Clinical and Diagnostic Research (JCDR), 7(10), 2180–2182.
+    </div>
+    <div class="ref-item">
+        <strong>2. Kombinierte orale Kontrazeptiva (150 µg Levonorgestrel / 30 µg Ethinylestradiol, OGTT):</strong><br>
+        Godsland, I. F., Crook, D., Simpson, R., Proudler, T., Felton, C., Lees, B., Anyaoku, V., Devenport, M., & Wynn, V. (1990).
+        <em>The effects of different formulations of oral contraceptive agents on lipid and carbohydrate metabolism.</em>
+        New England Journal of Medicine (NEJM), 323(20), 1375–1381.
+    </div>
+    <div class="ref-item">
+        <strong>3. Externe Literatur-Validierung der Insulinsensitivität (IVGTT):</strong><br>
+        Escalante Pulido, J. M., & Alpizar Salazar, M. (1999).
+        <em>Changes in insulin sensitivity, secretion and glucose effectiveness during menstrual cycle.</em>
+        Archives of Medical Research, 30(1), 19–22.
+    </div>
+    <div class="ref-item">
+        <strong>4. Mathematische Modellgrundlage (Bergman-Minimal-Modell):</strong><br>
+        Bergman, R. N., Ider, Y. Z., Bowden, C. R., & Cobelli, C. (1979).
+        <em>Quantitative estimation of insulin sensitivity.</em>
+        American Journal of Physiology-Endocrinology and Metabolism, 236(6), E667–E677.
+    </div>
+    """, unsafe_allow_html=True)
